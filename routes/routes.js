@@ -202,8 +202,74 @@ var appRouter = function(app) {
           res.send(rows);
         }
       });
-  });      
+  });
     
+
+    app.post("/changeUserRole", function(req, res, next) {
+    console.log('Entering into change user role');
+    console.log(req.body.userId);
+        
+    if(!req.body.userId || !req.body.newRole){
+      res.send({"status": "error", "message": "missing a parameter"});
+    } 
+    else{
+        console.log("aaa");
+        var sqlQuery = 'UPDATE USER SET USER_ROLE = "' + req.body.newRole + '" WHERE USER_ID = ' + req.body.userId;
+        console.log("Query "+sqlQuery);
+        app.connection.query(sqlQuery,  function(err,result2){
+            if(err) {
+              console.log(err);
+             
+                if(err){
+                  console.log(err);
+                  next(err);
+                }
+                res.send({"status": "error", "message": "user role update problem"});
+              }
+            
+          }); 
+        }
+    }); 
+    
+  app.get("/getAllUserDetails", function(req, res, next) {
+    console.log('Entering into Get all user Details');
+    
+    
+    var sqlQuery = 'SELECT USER_ID,USER_NAME,USER_EMAIL,USER_ROLE,USER_PHONE,USER_ADDR,USER_PHOTO FROM USERS WHERE USER_ROLE != "SUPER_ADMIN" ';
+     
+    console.log('####'+sqlQuery);
+    
+     app.connection.query(sqlQuery , 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+          res.send(rows);
+        }
+      });
+  });
+
+    
+    app.get("/getClaimableItemsforPickup", function(req, res, next) {
+        console.log('Entering into Get Claimable Items for Pickup');
+    
+    
+        var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY,  dItems.DONOR_USER_ID, u.USER_NAME, u.USER_EMAIL, u.USER_PHONE, u.USER_ADDR, u.USER_PHOTO FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID join users u on u.USER_ID = dItems.DONOR_USER_ID where IS_CLOSED = "N" and dItems.STATUS = "USER_CLAIMED" and NEED_PICKUP = "Y"'; 
+        
+        console.log('####'+sqlQuery);
+    
+        app.connection.query(sqlQuery , 
+        function(err, rows, fields) {
+            if (err){
+            // console.log(err);
+            return next(err);
+            }else{
+                res.send(rows);
+            }
+      });
+  });
+
     
 }
  
