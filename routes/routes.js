@@ -176,13 +176,30 @@ var appRouter = function(app) {
       function(err, rows, fields) {
         if (err){
           // console.log(err);
-          return next(err);
+          return next(err);  
         }else{
           res.send(rows);
         }
       });
   });         
     
+ app.get("/Login", function(req, res, next) {
+    console.log('Entering into Login');
+    
+    var sqlQuery = 'SELECT USER_ID,USER_NAME,USER_EMAIL,USER_ROLE,USER_PHONE,USER_ADDR,USER_PHOTO FROM user where USER_EMAIL = "'+ email +'" and USER_PASSWORD = "'+password+'"';
+     
+    console.log('####'+sqlQuery);
+    
+     app.connection.query(sqlQuery , 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+          res.send(rows);
+        }
+      });
+  });      
     
     
 }
