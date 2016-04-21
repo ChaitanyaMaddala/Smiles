@@ -76,9 +76,14 @@ var appRouter = function(app) {
 });  
     
   app.get("/getComments", function(req, res, next) {
-    console.log('requested for comments of an items');
-
-    app.connection.query('SELECT comment_id,user_id, description FROM comment where item_id = '+ req.query.itemId, 
+    console.log('requested for comments of an items'+req.query.itemId);
+     if(!req.query.itemId){
+      res.send({"status": "error", "message": "missing a parameter"});
+    }   
+      else {
+      var sqlQuery = 'SELECT COMMENT_ID, USER_ID, COMMENT, TIME_STAMP FROM comment where item_id  = ' + req.query.itemId + ' order by TIME_STAMP';
+      
+      app.connection.query(sqlQuery, 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -87,9 +92,36 @@ var appRouter = function(app) {
           res.send(rows);
         }
       });
+      }
   }); 
     
+  /*  
+    app.post("/addComments", function(req, res, next) {
+    console.log('requested for comments of an items'+req.body);
+     if(!req.body.itemId || !req.body.comment || !req.body.userId){
+      res.send({"status": "error", "message": "missing a parameter"});
+    }   
+      else {
+      var object = {
+        ITEM_ID : req.body.itemId,
+        USER_ID : req.body.userId,
+        COMMENT : req.body.comment,
+        TIME_STAMP : 'NOW()'
+      };      
+      
+      app.connection.query('INSERT INTO COMMENT(ITEM_ID,USER_ID,COMMENT,TIME_STAMP) VALUES() ',object, 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+          res.send(rows);
+        }
+      });
+      }
+  }); 
     
+    */
   app.get("/viewOrphanages", function(req, res, next) {
     console.log('Entering into View Orphanages');
 
@@ -266,6 +298,25 @@ var appRouter = function(app) {
             }else{
                 res.send(rows);
             }
+      });
+  });
+    
+    
+    app.get("/getActivitiesList", function(req, res, next) {
+    console.log('Entering into Get Activities List');
+    
+    var sqlQuery = 'SELECT WISHLIST_ID, ACTIVITY_NAME, a.ORPHANAGE_ID, o.ORPHANAGE_NAME, VISIT_DATE, IS_VISIT_COMPLETED FROM activity a join orphanage o on a.ORPHANAGE_ID = o.ORPHANAGE_ID';
+     
+    console.log('####'+sqlQuery);
+    
+     app.connection.query(sqlQuery , 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+          res.send(rows);
+        }
       });
   });
 
