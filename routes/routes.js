@@ -183,13 +183,13 @@ var appRouter = function(app) {
       });
   });         
     
- app.get("/Login", function(req, res, next) {
+ app.post("/Login", function(req, res, next) {
     console.log('Entering into Login');
      
     var email = req.body.userName;
     var password = req.body.password; 
     
-    var sqlQuery = 'SELECT USER_ID,USER_NAME,USER_EMAIL,USER_ROLE,USER_PHONE,USER_ADDR,USER_PHOTO FROM user where USER_EMAIL = "'+ email +'" and USER_PASSWORD = "'+password+'"';
+    var sqlQuery = 'SELECT USER_ID,USER_NAME,USER_EMAIL,USER_ROLE,USER_PHONE,USER_ADDR,USER_PHOTO FROM users where USER_EMAIL = "'+ email +'" and USER_PASSWORD = "'+password+'"';
      
     console.log('####'+sqlQuery);
     
@@ -213,7 +213,6 @@ var appRouter = function(app) {
       res.send({"status": "error", "message": "missing a parameter"});
     } 
     else{
-        console.log("aaa");
         var sqlQuery = 'UPDATE USER SET USER_ROLE = "' + req.body.newRole + '" WHERE USER_ID = ' + req.body.userId;
         console.log("Query "+sqlQuery);
         app.connection.query(sqlQuery,  function(err,result2){
