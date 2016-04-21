@@ -1,0 +1,73 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'git+https://git@github.com/felixge/node-mysql.git' ]
+2 info using npm@3.3.12
+3 info using node@v5.5.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData git+https://git@github.com/felixge/node-mysql.git
+8 silly fetchOtherPackageData git+https://git@github.com/felixge/node-mysql.git
+9 silly cache add args [ 'git+https://git@github.com/felixge/node-mysql.git', null ]
+10 verbose cache add spec git+https://git@github.com/felixge/node-mysql.git
+11 silly cache add parsed spec Result {
+11 silly cache add   raw: 'git+https://git@github.com/felixge/node-mysql.git',
+11 silly cache add   scope: null,
+11 silly cache add   name: null,
+11 silly cache add   rawSpec: 'git+https://git@github.com/felixge/node-mysql.git',
+11 silly cache add   spec: 'git+https://git@github.com/felixge/node-mysql.git',
+11 silly cache add   type: 'hosted',
+11 silly cache add   hosted:
+11 silly cache add    { type: 'github',
+11 silly cache add      ssh: 'git@github.com:felixge/node-mysql.git',
+11 silly cache add      sshUrl: 'git+ssh://git@github.com/felixge/node-mysql.git',
+11 silly cache add      httpsUrl: 'git+https://git@github.com/felixge/node-mysql.git',
+11 silly cache add      gitUrl: 'git://git@github.com/felixge/node-mysql.git',
+11 silly cache add      shortcut: 'github:felixge/node-mysql',
+11 silly cache add      directUrl: 'https://git@raw.githubusercontent.com/felixge/node-mysql/master/package.json' } }
+12 verbose addRemoteGit caching git+https://git@github.com/felixge/node-mysql.git
+13 verbose addRemoteGit git+https://git@github.com/felixge/node-mysql.git is a repository hosted by github
+14 silly tryClone cloning git+https://git@github.com/felixge/node-mysql.git via git+https://git@github.com/felixge/node-mysql.git
+15 verbose tryClone git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750 not in flight; caching
+16 warn addRemoteGit Error: not found: git
+16 warn addRemoteGit     at F (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:78:19)
+16 warn addRemoteGit     at E (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:82:29)
+16 warn addRemoteGit     at C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:93:16
+16 warn addRemoteGit     at FSReqWrap.oncomplete (fs.js:82:15)
+16 warn addRemoteGit  git+https://git@github.com/felixge/node-mysql.git resetting remote C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750 because of error: { [Error: not found: git] code: 'ENOGIT' }
+17 info resetRemote resetting C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750 for git+https://git@github.com/felixge/node-mysql.git
+18 silly gentlyRm C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750 is being purged
+19 verbose gentlyRm don't care about contents; nuking C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750
+20 silly vacuum-fs purging C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750
+21 silly vacuum-fs quitting because other entries in C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes
+22 error git clone --template=C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\_templates --mirror https://git@github.com/felixge/node-mysql.git C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750: undefined
+22 error git clone --template=C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\_templates --mirror https://git@github.com/felixge/node-mysql.git C:\Users\ChaitanyaM\AppData\Roaming\npm-cache\_git-remotes\git-https-git-github-com-felixge-node-mysql-git-f9577a815edd97b017afa833e1466750: undefined
+23 silly fetchPackageMetaData Error: not found: git
+23 silly fetchPackageMetaData     at F (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:78:19)
+23 silly fetchPackageMetaData     at E (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:82:29)
+23 silly fetchPackageMetaData     at C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:93:16
+23 silly fetchPackageMetaData     at FSReqWrap.oncomplete (fs.js:82:15)
+23 silly fetchPackageMetaData  error for git+https://git@github.com/felixge/node-mysql.git { [Error: not found: git] code: 'ENOGIT' }
+24 silly rollbackFailedOptional Starting
+25 silly rollbackFailedOptional Finishing
+26 silly runTopLevelLifecycles Starting
+27 silly runTopLevelLifecycles Finishing
+28 silly install printInstalled
+29 verbose stack Error: not found: git
+29 verbose stack     at F (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:78:19)
+29 verbose stack     at E (C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:82:29)
+29 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\which\which.js:93:16
+29 verbose stack     at FSReqWrap.oncomplete (fs.js:82:15)
+30 verbose cwd C:\Users\ChaitanyaM\Smiles
+31 error Windows_NT 6.1.7601
+32 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "git+https://git@github.com/felixge/node-mysql.git"
+33 error node v5.5.0
+34 error npm  v3.3.12
+35 error code ENOGIT
+36 error not found: git
+37 error Failed using git.
+37 error This is most likely not a problem with npm itself.
+37 error Please check if you have git installed and in your PATH.
+38 verbose exit [ 1, true ]

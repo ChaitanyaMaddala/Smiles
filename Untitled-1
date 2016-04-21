@@ -1,0 +1,29 @@
+app.post("/addSelfRequest", function(req, res, next) {
+    console.log('requested for donating item');
+
+    if(!req.body.user_id || !req.body.cat_id 
+      || !req.body.subcat_id ){
+      res.send({"status": "error", "message": "missing a parameter"});
+    } 
+    else{
+      var donationRequest = {
+        user_id: req.body.user_id,
+        total_cost: req.body.cat_id,
+        subcat_id : req.body.subcat_id,
+        status: "request"
+      };
+    
+        app.connection.query('INSERT INTO SELF_REQUEST SET ?', donationRequest, function(err,result2){
+            if(err) {
+              console.log(err);
+             
+                if(err){
+                  console.log(err);
+                  next(err);
+                }
+                res.send({"status": "error", "message": "insertion problem in SELF_REQUEST"});
+              };
+            
+          }); 
+    }
+});
