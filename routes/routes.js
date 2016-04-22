@@ -16,16 +16,16 @@ var appRouter = function(app) {
     console.log('requested for donating item');
     console.log(req.body);
     console.log("after");  
-    if(!req.body.user_id || !req.body.cat_id 
-      || !req.body.subcat_id ){
+    if(!req.body.userId || !req.body.itemName 
+      || !req.body.itemDescription){
       res.send({"status": "error", "message": "missing a parameter"});
     } 
     else{
       var donationRequest = {
-        user_id: req.body.user_id,
-        cat_id: req.body.cat_id,
-        sub_cat_id : req.body.subcat_id,
-        status: "request"
+        user_id: req.body.userId,
+        item_name: req.body.itemName,
+        item_description : req.body.itemDescription,
+        status: "requested"
       };
     
         app.connection.query('INSERT INTO SELF_REQUEST SET ?', donationRequest, function(err,result2){
@@ -54,10 +54,10 @@ var appRouter = function(app) {
     } 
     else{
       var donation = {
-        user_id: req.body.user_id,
-        wishlist_id: req.body.wishlist_id,
-        money : req.body.money,
-        timestamp : 'NOW()'  
+        user_id: req.body.userId,
+        wishlist_id: req.body.wishlistId,
+        money : req.body.money,  
+        reference_num : req.body.referenceNumber  
       };
     
         app.connection.query('INSERT INTO DONATION_MONEY SET ?', donation, function(err,result2){
@@ -69,7 +69,10 @@ var appRouter = function(app) {
                   next(err);
                 }
                 res.send({"status": "error", "message": "insertion problem in money"});
-              };
+              }
+            else {
+                res.send({"status": "success"});
+            }
             
           }); 
     }
@@ -153,7 +156,7 @@ var appRouter = function(app) {
     if(!req.query.userId)
         sqlQuery = 'SELECT donor_user_id,donationTable.ITEM_ID, wishItems.ITEM_NAME , wishItems.ITEM_DESCRIPTION, QUANTITY, donationTable.WISHLIST_ID, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems on donationTable.item_id = wishItems.item_id where STATUS = "USER_CLAIMED"' ;
     else
-        sqlQuery = 'SELECT donor_user_id,donationTable.ITEM_ID, wishItems.ITEM_NAME , wishItems.ITEM_DESCRIPTION, QUANTITY, donationTable.WISHLIST_ID, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems on donationTable.item_id = wishItems.item_id where STATUS = "USER_CLAIMED" and DONOR_USER_ID = '+ req.query.userId;
+        sqlQuery = 'SELECT donor_user_id,donationTable.ITEM_ID, wishItems.ITEM_NAME , wishItems.ITEM_DESCRIPTION, QUANTITY, donationTable.WISHLIST_ID, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems on donationTable.item_id = wishItems.item_id where STATUS != "DONATED" and DONOR_USER_ID = '+ req.query.userId;
       
     app.connection.query(sqlQuery, 
       function(err, rows, fields) {
@@ -165,6 +168,33 @@ var appRouter = function(app) {
         }
       });
   });     
+    
+     
+  app.post("/changeTransactionState", function(req, res, next) {
+        console.log('Entering into change transaction state');
+        
+        var status = req.body.status;
+        var sqlQuery;
+        if(status == "ARMY_CLAIMED"){
+            sqlQuery = 'UPDATE donation_items set STATUS = "ARMY_CLAIMED" , RECEIVER_USER_ID = '+req.body.armyId+ ' where TRANSACTION_ID = '+req.body.transactionID; 
+        }
+        else if(status == "DONATED") {
+            sqlQuery = 'UPDATE donation_items set STATUS = "DONATED" , RECEIVER_USER_ID = '+req.body.armyId+ ' where TRANSACTION_ID = '+req.body.transactionID;  
+        }
+    
+        console.log('####'+sqlQuery);
+    
+        app.connection.query(sqlQuery , 
+        function(err, rows, fields) {
+            if (err){
+            // console.log(err);
+            return next(err);
+            }else{
+                res.send({"status": "update success"});
+            }
+      });
+  });    
+     
 
  app.post("/createWishList", function(req, res, next) {
     console.log('Entering into create wish List');
@@ -204,7 +234,7 @@ var appRouter = function(app) {
      
     // console.log("Result :" + wishListItemsDB);
      
-    app.connection.query('INSERT INTO WISHLIST_ITEMS(ITEM_QTY, ITEM_NAME, ITEM_DESCRIPTION, APPROXIMATE_PRICE) VALUES ?', [wishlistItems] , 
+    app.connection.query('INSERT INTO WISHLIST_ITEMS(ITEM_NAME, ITEM_DESCRIPTION,ITEM_QTY,SINGLE_ITEM_PRICE, APPROXIMATE_PRICE, ITEMS_RECEIVED) VALUES ?', [wishlistItems] , 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -253,6 +283,54 @@ var appRouter = function(app) {
           res.send(rows);
         }
       });
+  });
+    
+    
+    app.post("/userClaimedtoDonate", function(req, res, next) {
+    console.log('Entering into Login');
+     
+    var object = {
+      item_id : req.body.itemId,
+      donor_user_id : req.body.userId,
+      status : "USER_CLAIMED",
+      quantity : req.body.quantity,
+      wishlist_id : req.body.wishlistId,
+      need_pickup : req.body.needPickup,
+      pickup_address : req.body.pickupAddress    
+    };
+    
+     app.connection.query('INSERT INTO DONATION_ITEMS SET ?' , object, 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+          res.send(rows);
+        }
+      });
+        
+      app.connection.query('SELECT ITEMS_RECEIVED FROM smiles_schema.wishlist_items where ITEM_ID = '+ req.body.itemId, 
+      function(err, rows, fields) {
+        if (err){
+          // console.log(err);
+          return next(err);
+        }else{
+            var total = rows[0].ITEMS_RECEIVED + req.body.quantity;
+            console.log("Total:"+total);
+            app.connection.query('UPDATE WISHLIST_ITEMS SET ITEMS_RECEIVED = '+total+ ' where item_id = '+req.body.itemId + ' and wishlist_id ='+req.body.wishlistId, 
+                function(err, rows, fields) {
+                    if (err){
+                        // console.log(err);
+                        return next(err);
+                    }else{
+                        res.send(rows);
+                    }
+            });
+            
+        }
+      });
+        
+        
   });
     
 
@@ -383,12 +461,48 @@ var appRouter = function(app) {
       });
   });
     
+     app.get("/getWishListTotalValue", function(req, res, next) {
+        console.log("wishListID :"+req.query.wishlistId); 
+        app.connection.query('SELECT SUM(APPROXIMATE_PRICE) AS TOTAL_PRICE, WISHLIST_ID FROM wishlist_items where WISHLIST_ID='+req.query.wishlistId,
+                            function(err, rows, fields) {
+                                if (err) {
+                                    // console.log(err);
+                                    return next(err);
+                                } else {
+                                    res.send(rows);
+                                }
+        });
+     });
     
-    /*  CALCULATE RECIEVED WORTH OF WISHLIST */
-    
-     app.get("/test", function(req, res, next) {
+     app.get("/getWishlistItemsReceivedCost", function(req,res,next){
+         
+        app.connection.query('SELECT ITEM_ID, SINGLE_ITEM_PRICE, ITEM_QTY, ITEMS_RECEIVED FROM WISHLIST_ITEMS where WISHLIST_ID ='+req.query.wishlistId,
+                            function(err, rows2, fields) {
+                                    if (err) {
+                                        // console.log(err);
+                                        return next(err);
+                                    }
+                                    else {
+                                        var itemWorthReceived = 0;
+                                            for(var j=0; j < rows2.length; j++) {
+                                                var singleItemPrice = rows2[j].SINGLE_ITEM_PRICE;
+                                                var totalItemsNeeded = rows2[j].ITEM_QTY;
+                                                var itemsReceived = rows2[j].ITEMS_RECEIVED;
+                                                console.log(singleItemPrice+" :"+totalItemsNeeded+" :"+itemsReceived);
+                                                itemWorthReceived = (itemWorthReceived + (itemsReceived*singleItemPrice));
+                                            }
+                                                
+                                        res.send({"wishlistId": req.query.wishlistId, "itemWorthReceived": itemWorthReceived});
+                                    }
+                                        
+                            });
+     });
+                                        
+    /*
+     app.get("/test123", function(req, res, next) {
         console.log('');
         var sqlQuery = "";
+        var wishList = [];
         app.connection.query('select WISHLIST_ID from activity where IS_VISIT_COMPLETED = "N"',
             function(err, rows, fields) {
                 if (err) {
@@ -398,20 +512,52 @@ var appRouter = function(app) {
                     console.log("result" + rows[0].WISHLIST_ID);
                     var wishlistCount = rows.length;
                     for (var i = 0; i < wishlistCount; i++) {
+                        var wish = {};
                         var wishListID = rows[i].WISHLIST_ID;
-                        app.connection.query('SELECT SUM(APPROXIMATE_PRICE) FROM wishlist_items where WISHLIST_ID = '+wishListID,
-                            function(err, rows, fields) {
+                        app.connection.query('SELECT SUM(APPROXIMATE_PRICE) AS TOTAL_PRICE, WISHLIST_ID FROM wishlist_items where WISHLIST_ID ='+wishListID,
+                            function(err, rows1, fields) {
                                 if (err) {
                                     // console.log(err);
                                     return next(err);
                                 } else {
-                                    console.log(rows[i].TOTAL_PRICE);
+                                    console.log("####"+rows1[0].WISHLIST_ID);
+                                    wish['wishListID'] = rows1[0].WISHLIST_ID;
+                                    wish['totalPrice'] = rows1[0].TOTAL_PRICE;
+                                    console.log("aaaa"+JSON.stringify(wish));
+                                    
+                                    var itemWorthReceived = 0;
+                                    app.connection.query('SELECT ITEM_ID, SINGLE_ITEM_PRICE, ITEM_QTY, ITEMS_RECEIVED FROM WISHLIST_ITEMS where WISHLIST_ID ='+wishListID,
+                                    function(err, rows2, fields) {
+                                        if (err) {
+                                        // console.log(err);
+                                        return next(err);
+                                        } else {
+                                            for(var j=0; j < rows2.length; j++) {
+                                                var singleItemPrice = rows2[j].SINGLE_ITEM_PRICE;
+                                                var totalItemsNeeded = rows2[j].ITEM_QTY;
+                                                var itemsReceived = rows2[j].ITEMS_RECEIVED;
+                                                console.log(singleItemPrice+" :"+totalItemsNeeded+" :"+itemsReceived);
+                                                itemWorthReceived = (itemWorthReceived + ((totalItemsNeeded-itemsReceived)*singleItemPrice));
+                                            }
+                                             wish['receivedWorth'] = itemWorthReceived;
+                                            console.log(itemWorthReceived);
+                                        }
+                                        wishList.push(wish);
+                                        console.log(JSON.stringify(wish));
+                                    });
+                                        
+                                        
                                 }
                             });
+                       
                     }
+                    console.log(wishList);
+                    res.send(wishList);
                 }
           });
      });    
+    
+    */
 }
  
 module.exports = appRouter;
