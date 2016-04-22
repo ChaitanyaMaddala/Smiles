@@ -219,7 +219,7 @@ var appRouter = function(app) {
  app.get("/getWishList", function(req, res, next) {
     console.log('Entering into get wish list items');
 
-     if(!req.param.wishlistId){
+     if(!req.query.wishlistId){
          res.send({"status": "error", "message": "missing a parameter"});
      }
      
