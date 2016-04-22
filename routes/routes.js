@@ -219,7 +219,11 @@ var appRouter = function(app) {
  app.get("/getWishList", function(req, res, next) {
     console.log('Entering into get wish list items');
 
-    app.connection.query('SELECT ITEM_ID, ITEM_NAME, ITEM_DESCRIPTION, ITEM_QTY FROM wishlist_items', 
+     if(!req.param.wishlistId){
+         res.send({"status": "error", "message": "missing a parameter"});
+     }
+     
+    app.connection.query('SELECT ITEM_ID, ITEM_NAME, ITEM_DESCRIPTION, ITEM_QTY, APPROXIMATE_PRICE, ITEMS_RECEIVED FROM wishlist_items where WISHLIST_ID ='+req.query.wishlistId, 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -378,8 +382,36 @@ var appRouter = function(app) {
         }
       });
   });
-
     
+    
+    /*  CALCULATE RECIEVED WORTH OF WISHLIST */
+    
+     app.get("/test", function(req, res, next) {
+        console.log('');
+        var sqlQuery = "";
+        app.connection.query('select WISHLIST_ID from activity where IS_VISIT_COMPLETED = "N"',
+            function(err, rows, fields) {
+                if (err) {
+                    // console.log(err);
+                    return next(err);
+                } else {
+                    console.log("result" + rows[0].WISHLIST_ID);
+                    var wishlistCount = rows.length;
+                    for (var i = 0; i < wishlistCount; i++) {
+                        var wishListID = rows[i].WISHLIST_ID;
+                        app.connection.query('SELECT SUM(APPROXIMATE_PRICE) FROM wishlist_items where WISHLIST_ID = '+wishListID,
+                            function(err, rows, fields) {
+                                if (err) {
+                                    // console.log(err);
+                                    return next(err);
+                                } else {
+                                    console.log(rows[i].TOTAL_PRICE);
+                                }
+                            });
+                    }
+                }
+          });
+     });    
 }
  
 module.exports = appRouter;
