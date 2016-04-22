@@ -48,7 +48,7 @@ var appRouter = function(app) {
     console.log('Entering into Donating money service');
     console.log(req.body);
 
-    if(!req.body.user_id || !req.body.wishlist_id 
+    if(!req.body.userId || !req.body.wishlistId 
       || !req.body.money ){
       res.send({"status": "error", "message": "missing a parameter"});
     } 
@@ -123,9 +123,15 @@ var appRouter = function(app) {
     
     */
   app.get("/viewOrphanages", function(req, res, next) {
-    console.log('Entering into View Orphanages');
-
-    app.connection.query('SELECT * FROM ORPHANAGE', 
+    console.log('Entering into View Orphanages with query param :'+req.query.orphanageId);
+    
+    var sqlQuery;  
+    if(!req.query.orphanageId)
+        sqlQuery = 'SELECT * FROM ORPHANAGE';
+    else
+        sqlQuery = 'SELECT * FROM ORPHANAGE where ORPHANAGE_ID = '+req.query.orphanageId;
+      
+    app.connection.query(sqlQuery, 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -134,13 +140,23 @@ var appRouter = function(app) {
           res.send(rows);
         }
       });
-  });     
+  }); 
+    
+  
+      
     
     
   app.get("/viewClaimsofDonor", function(req, res, next) {
     console.log('Entering into get Claims of Donor');
-
-    app.connection.query('SELECT donationTable.ITEM_ID, wishItems.ITEM_NAME , QTY_DONATED, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems where DONOR_USER_ID = 1', 
+      
+    var sqlQuery;
+    
+    if(!req.query.userId)
+        sqlQuery = 'SELECT donor_user_id,donationTable.ITEM_ID, wishItems.ITEM_NAME , wishItems.ITEM_DESCRIPTION, QUANTITY, donationTable.WISHLIST_ID, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems on donationTable.item_id = wishItems.item_id where STATUS = "USER_CLAIMED"' ;
+    else
+        sqlQuery = 'SELECT donor_user_id,donationTable.ITEM_ID, wishItems.ITEM_NAME , wishItems.ITEM_DESCRIPTION, QUANTITY, donationTable.WISHLIST_ID, STATUS FROM DONATION_ITEMS donationTable join wishlist_items wishItems on donationTable.item_id = wishItems.item_id where STATUS = "USER_CLAIMED" and DONOR_USER_ID = '+ req.query.userId;
+      
+    app.connection.query(sqlQuery, 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -300,6 +316,28 @@ var appRouter = function(app) {
             }
       });
   });
+    
+    /*
+      app.get("/getArmyClaimedItemsforPickup", function(req, res, next) {
+        console.log('Entering into Get Army Claimed Items for Pickup' + req.query.armyId);
+        
+        if(!req.query.armyId){
+        var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY,  dItems.DONOR_USER_ID, u.USER_NAME, u.USER_EMAIL, u.USER_PHONE, u.USER_ADDR, u.USER_PHOTO FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID join users u on u.USER_ID = dItems.DONOR_USER_ID where IS_CLOSED = "N" and dItems.STATUS = "ARMY_CLAIMED" and NEED_PICKUP = "Y" and dItems.RECEIVER_USER_ID = '+req.query.armyId; 
+        
+        console.log('####'+sqlQuery);
+    
+        app.connection.query(sqlQuery , 
+        function(err, rows, fields) {
+            if (err){
+            // console.log(err);
+            return next(err);
+            }else{
+                res.send(rows);
+            }
+      });
+    }
+  });
+  */
     
     
     app.get("/getActivitiesList", function(req, res, next) {
