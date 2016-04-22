@@ -317,11 +317,13 @@ var appRouter = function(app) {
       });
   });
     
-    /*
+    
       app.get("/getArmyClaimedItemsforPickup", function(req, res, next) {
         console.log('Entering into Get Army Claimed Items for Pickup' + req.query.armyId);
         
         if(!req.query.armyId){
+          res.send({"status": "error", "message": "missing a parameter"});   
+        }
         var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY,  dItems.DONOR_USER_ID, u.USER_NAME, u.USER_EMAIL, u.USER_PHONE, u.USER_ADDR, u.USER_PHOTO FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID join users u on u.USER_ID = dItems.DONOR_USER_ID where IS_CLOSED = "N" and dItems.STATUS = "ARMY_CLAIMED" and NEED_PICKUP = "Y" and dItems.RECEIVER_USER_ID = '+req.query.armyId; 
         
         console.log('####'+sqlQuery);
@@ -335,15 +337,35 @@ var appRouter = function(app) {
                 res.send(rows);
             }
       });
-    }
   });
-  */
+    
+    
+   app.get("/getUserClaimedItemDetails", function(req, res, next) {
+        console.log('Entering into Get User Claimed Items' + req.query.userId);
+        
+        if(!req.query.userId){
+          res.send({"status": "error", "message": "missing a parameter"});   
+        }
+        var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY, dItems.NEED_PICKUP, dItems.PICKUP_ADDRESS FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID where IS_CLOSED = "N" and dItems.STATUS = "USER_CLAIMED" and dItems.DONOR_USER_ID = '+req.query.userId; 
+        
+        console.log('####'+sqlQuery);
+    
+        app.connection.query(sqlQuery , 
+        function(err, rows, fields) {
+            if (err){
+            // console.log(err);
+            return next(err);
+            }else{
+                res.send(rows);
+            }
+      });
+  });
     
     
     app.get("/getActivitiesList", function(req, res, next) {
     console.log('Entering into Get Activities List');
     
-    var sqlQuery = 'SELECT WISHLIST_ID, ACTIVITY_NAME, a.ORPHANAGE_ID, o.ORPHANAGE_NAME, VISIT_DATE, IS_VISIT_COMPLETED FROM activity a join orphanage o on a.ORPHANAGE_ID = o.ORPHANAGE_ID';
+    var sqlQuery = 'SELECT WISHLIST_ID, ACTIVITY_NAME, a.ORPHANAGE_ID, o.ORPHANAGE_NAME, IMAGE,  VISIT_DATE, IS_VISIT_COMPLETED FROM activity a join orphanage o on a.ORPHANAGE_ID = o.ORPHANAGE_ID';
      
     console.log('####'+sqlQuery);
     
