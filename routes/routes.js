@@ -195,6 +195,59 @@ var appRouter = function(app) {
       });
   });    
      
+    
+app.post("/createActivityandWishList", function(req, res, next){
+    
+        var object = {
+            activity_name : req.body.activityName, 
+            visit_date : req.body.visitDate,
+            orphanage_id : req.body.orphanageId,
+            image : ""
+        };
+    
+       function ObjToArray(obj) {
+            var arr = obj instanceof Array;
+
+            return (arr ? obj : Object.keys(obj)).map(function(i) {
+                var val = arr ? i : obj[i];
+                if(typeof val === 'object')
+                    return ObjToArray(val);
+                else
+                    return val;
+            });
+         }
+         
+    
+      app.connection.query('INSERT INTO ACTIVITY SET ?', object , 
+          function(err, rows, fields) {
+            if (err){
+              // console.log(err);
+              return next(err);
+            }else{
+                var wishlistId = rows.insertId;
+            
+                var wishlistItems = ObjToArray(req.body.Sheet1);
+                
+                for(var i =0; i < wishlistItems.length; i++){
+                    wishlistItems[i].push(wishlistId);
+                }
+     
+                app.connection.query('INSERT INTO WISHLIST_ITEMS(ITEM_NAME, ITEM_DESCRIPTION,ITEM_QTY,SINGLE_ITEM_PRICE, APPROXIMATE_PRICE, ITEMS_RECEIVED, WISHLIST_ID) VALUES ?', [wishlistItems] , 
+                        function(err, rows, fields) {
+                            if (err){
+                                // console.log(err);
+                                return next(err);
+                            }else{
+                                res.send(rows);
+                            }
+                        });
+            }     
+
+      });
+  });
+    
+   
+ 
 
  app.post("/createWishList", function(req, res, next) {
     console.log('Entering into create wish List');
@@ -219,10 +272,11 @@ var appRouter = function(app) {
      
      var wishlistItems = ObjToArray(req.body.Sheet1);
      console.log(wishlistItems);
-     /*for(var i =0; i < wishlistItems.length; i++){
      
-         var wishListItemDB = {};
-         
+     for(var i =0; i < wishlistItems.length; i++){
+     
+         wishlistItems[i].push(3);
+         /*
          wishListItemDB.ITEM_NAME = wishlistItems[i].Wish;
          wishListItemDB.ITEM_DESCRIPTION = wishlistItems[i].Description;
          wishListItemDB.WISHLIST_ID = wishlistItems[i].
@@ -230,11 +284,12 @@ var appRouter = function(app) {
          
          wishListItemsDB.push(wishListItemDB);
          console.log(wishListItemDB);
-     }*/
+         */
+     }
      
-    // console.log("Result :" + wishListItemsDB);
+     console.log("Result :" + wishlistItems);
      
-    app.connection.query('INSERT INTO WISHLIST_ITEMS(ITEM_NAME, ITEM_DESCRIPTION,ITEM_QTY,SINGLE_ITEM_PRICE, APPROXIMATE_PRICE, ITEMS_RECEIVED) VALUES ?', [wishlistItems] , 
+    app.connection.query('INSERT INTO WISHLIST_ITEMS(ITEM_NAME, ITEM_DESCRIPTION, APPROXIMATE_PRICE, WISHLIST_ID) VALUES ?', [wishlistItems] , 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
