@@ -339,13 +339,13 @@ var appRouter = function(app) {
   });
     
     
-   app.get("/getUserClaimedItemDetails", function(req, res, next) {
-        console.log('Entering into Get User Claimed Items' + req.query.userId);
+   app.get("/getUserDonatedItemDetails", function(req, res, next) {
+        console.log('Entering into Get User Donated Items' + req.query.userId);
         
         if(!req.query.userId){
           res.send({"status": "error", "message": "missing a parameter"});   
         }
-        var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY, dItems.NEED_PICKUP, dItems.PICKUP_ADDRESS FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID where IS_CLOSED = "N" and dItems.STATUS = "USER_CLAIMED" and dItems.DONOR_USER_ID = '+req.query.userId; 
+        var sqlQuery = 'SELECT dItems.TRANSACTION_ID, dItems.ITEM_ID, wItems.ITEM_NAME, wItems.ITEM_DESCRIPTION, dItems.QUANTITY, dItems.WISHLIST_ID, a.ACTIVITY_NAME, a.VISIT_DATE FROM donation_items dItems join wishlist_items wItems on dItems.ITEM_ID = wItems.ITEM_ID join activity a on a.WISHLIST_ID = dItems.WISHLIST_ID where IS_CLOSED = "N" and dItems.STATUS = "DONATED" and dItems.DONOR_USER_ID = '+req.query.userId; 
         
         console.log('####'+sqlQuery);
     
