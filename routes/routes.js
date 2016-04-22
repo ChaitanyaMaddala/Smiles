@@ -95,7 +95,7 @@ var appRouter = function(app) {
       }
   }); 
     
-  /*  
+   
     app.post("/addComments", function(req, res, next) {
     console.log('requested for comments of an items'+req.body);
      if(!req.body.itemId || !req.body.comment || !req.body.userId){
@@ -106,10 +106,9 @@ var appRouter = function(app) {
         ITEM_ID : req.body.itemId,
         USER_ID : req.body.userId,
         COMMENT : req.body.comment,
-        TIME_STAMP : 'NOW()'
       };      
       
-      app.connection.query('INSERT INTO COMMENT(ITEM_ID,USER_ID,COMMENT,TIME_STAMP) VALUES() ',object, 
+      app.connection.query('INSERT INTO COMMENT SET ?', object, 
       function(err, rows, fields) {
         if (err){
           // console.log(err);
@@ -121,7 +120,7 @@ var appRouter = function(app) {
       }
   }); 
     
-    */
+    
   app.get("/viewOrphanages", function(req, res, next) {
     console.log('Entering into View Orphanages with query param :'+req.query.orphanageId);
     
