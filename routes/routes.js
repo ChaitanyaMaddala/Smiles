@@ -202,7 +202,7 @@ app.post("/createActivityandWishList", function(req, res, next){
             activity_name : req.body.activityName, 
             visit_date : req.body.visitDate,
             orphanage_id : req.body.orphanageId,
-            image : ""
+            image : req.body.image
         };
     
        function ObjToArray(obj) {

@@ -23,5 +23,6 @@
 	}],
 	"orphanageId": 1,
 	"visitDate": "29/04//2016",
-	"activityName": "Holi Celebrations"
+	"activityName": "Holi Celebrations",
+	"image" : "http://media2.intoday.in/indiatoday/images/Photo_gallery/2013_3holi-12_032713024848.jpg"
 }
